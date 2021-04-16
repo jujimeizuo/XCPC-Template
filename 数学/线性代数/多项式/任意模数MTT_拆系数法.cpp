@@ -64,10 +64,10 @@ inline void MTT(ll *x, ll *y, ll *z, int n) {
     for (int i = 0; i < len; i++) b[i] = dftc[i] + dftd[i] * Complex(0, 1);
     FFT(a, len), FFT(b, len);
     for (int i = 0; i < len; i++) {
-        int da = (ll)(a[i].x / len + 0.5) % mod;
-        int db = (ll)(a[i].y / len + 0.5) % mod;
-        int dc = (ll)(b[i].x / len + 0.5) % mod;
-        int dd = (ll)(b[i].y / len + 0.5) % mod;
+        ll da = (ll)(a[i].x / len + 0.5) % mod;
+        ll db = (ll)(a[i].y / len + 0.5) % mod;
+        ll dc = (ll)(b[i].x / len + 0.5) % mod;
+        ll dd = (ll)(b[i].y / len + 0.5) % mod;
         z[i] = (da + ((ll)(db + dc) << 15) + ((ll)dd << 30)) % mod;
     }
 }
