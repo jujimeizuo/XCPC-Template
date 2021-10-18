@@ -1,0 +1,21 @@
+{
+    "C_Cpp.errorSquiggles": "Enabled",
+    "files.associations": {
+        "random": "cpp",
+        "cmath": "cpp",
+        "vector": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "xstring": "cpp",
+        "algorithm": "cpp",
+        "chrono": "cpp",
+        "limits": "cpp",
+        "valarray": "cpp",
+        "xtree": "cpp",
+        "xlocale": "cpp",
+        "iosfwd": "cpp",
+        "iterator": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
+    }
+}
