@@ -300,6 +300,7 @@ struct Poly {
 };
 
 int main() {
+    // fenzhi fft
     auto solve = [&](auto self, int l, int r) {
         if (r - l == 1) {
             return Poly({1,  "init" });
@@ -310,4 +311,9 @@ int main() {
     
     auto p = solve(solve, 0, n);
     
+    // pow(k) 长度为n的多项式，求k次幂前m项
+    Poly a; a.resize(n);
+    a = a.log(m);
+    for(int i = 0;i < m; i++) a.a[i] = a.a[i] * k;
+    a = a.exp(m);
 }
