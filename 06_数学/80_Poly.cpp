@@ -302,7 +302,7 @@ struct Poly {
 int main() {
     auto solve = [&](auto self, int l, int r) {
         if (r - l == 1) {
-            return Poly({1, int(adj[l].size()) - (l > 0)});
+            return Poly({1,  "init" });
         }
         int m = (l + r) / 2;
         return self(self, l, m) * self(self, m, r);
