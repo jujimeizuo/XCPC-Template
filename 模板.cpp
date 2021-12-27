@@ -5,6 +5,7 @@ using namespace std;
 typedef long long ll;
 typedef long double ld;
 typedef unsigned long long ull;
+typedef vector<int> VI;
 typedef pair<int, int> pii;
 typedef pair<double, double> pdd;
 typedef pair<ll, ll> pll;
