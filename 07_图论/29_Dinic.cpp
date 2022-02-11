@@ -1,75 +1,67 @@
-
-struct Dinic {
-    static const int N = 1e3 + 10, M = 2e5 + 10, INF = 0x3f3f3f;
-    int n, m, s, t;
-    int maxflow;
-    int deep[N], cur[N];
-
+class Flow {
+public :
+    static constexpr int INF = 1e9;
+    int n;
     struct Edge {
-        int v, next;
-        int cap;
-    }e[M << 1];
-    int head[M << 1], cnt;
-
-    void init() {
-        memset(head, -1, sizeof head);
-        cnt = maxflow = 0;
-    }
-
-    void add(int u, int v, int cap) {
-        e[cnt].v = v;
-        e[cnt].cap = cap;
-        e[cnt].next = head[u];
-        head[u] = cnt++;
-        
-        e[cnt].v = u;
-        e[cnt].cap = 0;
-        e[cnt].next = head[v];
-        head[v] = cnt++;
-    }
-
-    bool bfs() {
-        for(int i = 0;i <= t; i++) {
-            deep[i] = -1, cur[i] = head[i];
-        }
-        queue<int> q;   
-        q.push(s); deep[s] = 0;
-        while(!q.empty()) {
-            int u = q.front(); q.pop();
-                for(int i = head[u]; ~i; i = e[i].next) {
-                int v = e[i].v;
-                if(deep[v] == -1 && e[i].cap) {
-                    deep[v] = deep[u] + 1;
-                    q.push(v);
+        int to, cap;
+        Edge(int to, int cap) : to(to), cap(cap) {}
+    };
+    std::vector<Edge> e;
+    std::vector<std::vector<int>> g;
+    std::vector<int> cur, h;
+    Flow(int n) : n(n), g(n) {}
+    bool bfs(int s, int t) {
+        h.assign(n, -1);
+        std::queue<int> que;
+        h[s] = 0;
+        que.push(s);
+        while (!que.empty()) {
+            int u = que.front();
+            que.pop();
+            for (int i : g[u]) {
+                int v = e[i].to;
+                int c = e[i].cap;
+                if (c > 0 && h[v] == -1) {
+                    h[v] = h[u] + 1;
+                    if (v == t)
+                        return true;
+                    que.push(v);
                 }
             }
         }
-        if(deep[t] >= 0) return true;
-        else return false;
+        return false;
     }
-
-    int dfs(int u, int mx) {
-        int a;
-        if(u == t) return mx;
-        for(int i = cur[u]; ~i; i = e[i].next) {
-            cur[u] = i;
-            int v = e[i].v;
-            if(e[i].cap && deep[v] == deep[u] + 1 && (a = dfs(v, min(mx, e[i].cap)))) {
-                e[i].cap -= a;
-                e[i ^ 1].cap += a;
-                return a;
+    int dfs(int u, int t, int f) {
+        if (u == t)
+            return f;
+        int r = f;
+        for (int &i = cur[u]; i < int(g[u].size()); ++i) {
+            int j = g[u][i];
+            int v = e[j].to;
+            int c = e[j].cap;
+            if (c > 0 && h[v] == h[u] + 1) {
+                int a = dfs(v, t, std::min(r, c));
+                e[j].cap -= a;
+                e[j ^ 1].cap += a;
+                r -= a;
+                if (r == 0)
+                    return f;
             }
         }
-        return 0;
+        return f - r;
     }
-
-    void dinic() {
-        while(bfs()) {
-            while(1) {
-                int res = dfs(s, INF);
-                if(!res) break;
-                maxflow += res;
-            }
+    void addEdge(int u, int v, int c) {
+        g[u].push_back(e.size());
+        e.emplace_back(v, c);
+        g[v].push_back(e.size());
+        e.emplace_back(u, 0);
+    }
+    int maxFlow(int s, int t) {
+        int ans = 0;
+        while (bfs(s, t)) {
+            cur.assign(n, 0);
+            ans += dfs(s, t, INF);
         }
+        return ans;
     }
-}mf;
+};
