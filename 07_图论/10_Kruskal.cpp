@@ -1,40 +1,25 @@
-//Kruskal算法求最小生成树（稀疏图）
-
-// 一个无向图，求最小生成树各边的和
-
-struct Kruskal {
-    static const int N = 1e6 + 10;
-    int n, m, ans;
-    struct Edge {
-        int u, v, w;
-        bool operator < (const Edge& rhs) const {
-            return w < rhs.w;
-        }
-    }e[N << 1];
-    int f[N];
-
-    void init() {
-        for(int i = 1;i <= n; i++) f[i] = i;
-        m = 0;
+template<typename T>
+class Kruskal {
+public :
+    const int n;
+    T ans;
+    std::vector<tuple<int, int, T>> edge;
+    Kruskal(int n) : n(n), edge(n), ans(0) {}
+    void add(int u, int v, T w) {
+        edge.emplace_back(u, v, w);
     }
-
-    void add(int u, int v, int w) {
-        e[++m] = {u, v, w};
-    }
-
-    int find(int x) {
-        return f[x] == x ? x : f[x] = find(f[x]);
-    }
-
     void kruskal() {
         int cnt = 0;
-        sort(e + 1, e + m + 1);
-        for(int i = 1;i <= m; i++) {
-            int u = find(e[i].u);
-            int v = find(e[i].v);
-            if(u == v) continue;
-            f[v] = u; ans += e[i].w;
-            if(++cnt == n - 1) break;
+        DSU g(n);
+        sort(edge.begin(), edge.end(), [&](tuple<int, int, T> a, tuple<int, int, T> b) {
+            return get<2>(a) < get<2>(b);
+        });
+        for(auto e : edge) {
+            int u, v; T w;
+            tie(u, v, w) = e;
+            if(!g.merge(u, v)) continue ;
+            ans += w;
+            if(++cnt == n - 1) break ;
         }
     }
-}krl;
+};
