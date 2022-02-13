@@ -1,21 +1,29 @@
-struct HashTable {
-    static const int MOD = 1e7 + 10;
-    struct edge {
-        int nxt;
-        ll num, val;
-    } e[MOD];
-    int head[MOD], tot;
-    void clear() { tot = 0; memset(head, 0, sizeof(head)); }
-    void add(ll u, ll w) { e[++tot] = edge{head[u % MOD], u, w }, head[u % MOD] = tot; }
-    void insert(ll u, ll w) {
-        for(int i = head[u % MOD]; i; i = e[i].nxt) {
-            if(e[i].num == u) { e[i].val += w; return ; }
-        }
-        add(u, w);
+template<typename T>
+class HashTable{
+private :
+    const int maxn;
+    std::vector<std::vector<T>> key, val;
+
+public :
+    HashTable(int n) : maxn(n), key(n), val(n) {}
+
+    int hash(int x){
+        return (((long long)x * (x + 1)) ^ x) % maxn;
     }
-    int find(ll u) {
-        for (int i = head[u % MOD]; i; i = e[i].nxt)
-            if (e[i].num == u) return e[i].val;
-        return -1;
+    void insert(int x){
+        int u = hash(x);
+        for(int v = 0; v < (int)key[u].size(); ++v)
+            if(key[u][v] == x){
+                ++val[u][v];
+                return;
+            }
+        key[u].push_back(x), val[u].push_back(1);
     }
-} hs;
+    T query(int x){
+        int u = hash(x);
+        for(int v = 0; v < (int)key[u].size(); ++v)
+            if(key[u][v] == x)
+                return val[u][v];
+        return 0;
+    }
+};
