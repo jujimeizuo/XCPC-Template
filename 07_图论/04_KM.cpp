@@ -1,85 +1,135 @@
-//https://ac.nowcoder.com/acm/contest/view-submission?submissionId=44654655
+template <typename T>
+class hungarian {  // km
+public :
+  int n;
+  std::vector<int> matchx;  // 左集合对应的匹配点
+  std::vector<int> matchy;  // 右集合对应的匹配点
+  std::vector<int> pre;     // 连接右集合的左点
+  std::vector<bool> visx;   // 拜访数组 左
+  std::vector<bool> visy;   // 拜访数组 右
+  std::vector<T> lx;
+  std::vector<T> ly;
+  std::vector<vector<T> > g;
+  std::vector<T> slack;
+  T inf;
+  T res;
+  std::queue<int> q;
+  int org_n;
+  int org_m;
 
-struct KM {
-#define type int
-    //#define inf 0x3f3f3f3f
-    static const int N = 505;
-    static const int INF = 0x3f3f3f3f;
-    int n, mx[N], my[N], prv[N];
-    type slk[N], lx[N], ly[N], w[N][N];
-    bool vx[N], vy[N];
+  hungarian(int _n, int _m) {
+    org_n = _n;
+    org_m = _m;
+    n = max(_n, _m);
+    inf = numeric_limits<T>::max();
+    res = 0;
+    g = vector<vector<T> >(n, vector<T>(n));
+    matchx = vector<int>(n, -1);
+    matchy = vector<int>(n, -1);
+    pre = vector<int>(n);
+    visx = vector<bool>(n);
+    visy = vector<bool>(n);
+    lx = vector<T>(n, -inf);
+    ly = vector<T>(n);
+    slack = vector<T>(n);
+  }
 
-    void init(int siz) {
-        n = siz;
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                w[i][j] = -505;
+  void addEdge(int u, int v, int w) {
+    g[u][v] = max(w, 0);  // 负值还不如不匹配 因此设为0不影响
+  }
+
+  bool check(int v) {
+    visy[v] = true;
+    if (matchy[v] != -1) {
+      q.push(matchy[v]);
+      visx[matchy[v]] = true;  // in S
+      return false;
+    }
+    // 找到新的未匹配点 更新匹配点 pre 数组记录着"非匹配边"上与之相连的点
+    while (v != -1) {
+      matchy[v] = pre[v];
+      swap(v, matchx[pre[v]]);
+    }
+    return true;
+  }
+
+  void bfs(int i) {
+    while (!q.empty()) {
+      q.pop();
+    }
+    q.push(i);
+    visx[i] = true;
+    while (true) {
+      while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        for (int v = 0; v < n; v++) {
+          if (!visy[v]) {
+            T delta = lx[u] + ly[v] - g[u][v];
+            if (slack[v] >= delta) {
+              pre[v] = u;
+              if (delta) {
+                slack[v] = delta;
+              } else if (check(v)) {  // delta=0 代表有机会加入相等子图 找增广路
+                                      // 找到就return 重建交错树
+                return;
+              }
             }
+          }
         }
+      }
+      // 没有增广路 修改顶标
+      T a = inf;
+      for (int j = 0; j < n; j++) {
+        if (!visy[j]) {
+          a = min(a, slack[j]);
+        }
+      }
+      for (int j = 0; j < n; j++) {
+        if (visx[j]) {  // S
+          lx[j] -= a;
+        }
+        if (visy[j]) {  // T
+          ly[j] += a;
+        } else {  // T'
+          slack[j] -= a;
+        }
+      }
+      for (int j = 0; j < n; j++) {
+        if (!visy[j] && slack[j] == 0 && check(j)) {
+          return;
+        }
+      }
+    }
+  }
+
+  void solve() {
+    // 初始顶标
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        lx[i] = max(lx[i], g[i][j]);
+      }
     }
 
-    void add_edge(int x, int y, type val) { w[x][y] = val; }
-
-    void match(int y) { while (y) swap(y, mx[my[y] = prv[y]]); }
-
-    void bfs(int x) {
-        int i, y;
-        type d;
-        for (i = 1; i <= n; i++) {
-            vx[i] = vy[i] = 0;
-            slk[i] = INF;
-        }
-        queue<int> q;
-        q.push(x);
-        vx[x] = 1;
-        while (1) {
-            while (!q.empty()) {
-                x = q.front();
-                q.pop();
-                for (y = 1; y <= n; y++) {
-                    d = lx[x] + ly[y] - w[x][y];
-                    if (!vy[y] && d <= slk[y]) {
-                        prv[y] = x;
-                        if (!d) {
-                            if (!my[y]) return match(y);
-                            q.push(my[y]);
-                            vx[my[y]] = 1;
-                            vy[y] = 1;
-                        } else slk[y] = d;
-                    }
-                }
-            }
-            d = INF + 1;
-            for (i = 1; i <= n; i++) {
-                if (!vy[i] && slk[i] < d) {
-                    d = slk[i];
-                    y = i;
-                }
-            }
-            for (i = 1; i <= n; i++) {
-                if (vx[i]) lx[i] -= d;
-                if (vy[i]) ly[i] += d;
-                else slk[i] -= d;
-            }
-            if (!my[y]) return match(y);
-            q.push(my[y]);
-            vx[my[y]] = 1;
-            vy[y] = 1;
-        }
+    for (int i = 0; i < n; i++) {
+      fill(slack.begin(), slack.end(), inf);
+      fill(visx.begin(), visx.end(), false);
+      fill(visy.begin(), visy.end(), false);
+      bfs(i);
     }
 
-    type max_match() {
-        int i;
-        type res;
-        for (i = 1; i <= n; i++) {
-            mx[i] = my[i] = ly[i] = 0;
-            lx[i] = *max_element(w[i] + 1, w[i] + n + 1);
-        }
-        for (i = 1; i <= n; i++) bfs(i);
-        res = 0;
-        for (i = 1; i <= n; i++) res += lx[i] + ly[i];
-        return res;
+    // custom
+    for (int i = 0; i < n; i++) {
+      if (g[i][matchx[i]] > 0) {
+        res += g[i][matchx[i]];
+      } else {
+        matchx[i] = -1;
+      }
     }
-
-#undef type
+    // cout << res << "\n";
+    // for (int i = 0; i < org_n; i++) {
+    //   cout << matchx[i] + 1 << " ";
+    // }
+    // cout << "\n";
+  }
 };
