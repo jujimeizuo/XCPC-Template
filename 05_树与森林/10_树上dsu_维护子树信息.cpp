@@ -8,6 +8,7 @@ bool vis[N];
 int maxx, sum;
 // maxx为每棵子树里出现最多的颜色，sum为编号和
 
+
 void calc(int u, int fa, int val) {
     /*
     针对不同问题，采取的操作
