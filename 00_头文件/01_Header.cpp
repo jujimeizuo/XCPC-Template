@@ -24,6 +24,7 @@ const double PI = acos(-1);
 const double R = 0.57721566490153286060651209;
 
 
+
 void solve() {
 
 }
