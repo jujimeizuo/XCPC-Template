@@ -74,3 +74,4 @@ struct LinearBasis {
         return ret;
     }
 };
+
