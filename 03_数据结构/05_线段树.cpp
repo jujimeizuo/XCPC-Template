@@ -8,6 +8,7 @@ struct Tree {
     int l, r;
     int sum, tag;
 }t[N << 1];
+int init[N];
 
 void push_up(int u) {
     t[u].sum = t[lc].sum + t[rc].sum;
@@ -20,6 +21,19 @@ void push_down(int u) {
     t[lc].tag += t[u].tag;
     t[rc].tag += t[u].tag;
     t[u].tag = 0;
+}
+
+void build(int u, int l, int r) {
+    t[u].l = l; t[u].r = r;
+    t[u].tag = 0;
+    if (l == r) {
+        t[u].sum = init[l];
+        return ;
+    }
+    int m = (l + r) / 2;
+    build(lc, l, m);
+    build(rc, m + 1, r);
+    push_up(u);
 }
 
 void modify(int u, int ql, int qr, int v) {
