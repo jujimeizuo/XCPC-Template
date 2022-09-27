@@ -11,7 +11,7 @@ int norm(int x) {
     return x;
 }
 template<class T>
-T power(T a, int b) {
+T power(T a, i64 b) {
     T res = 1;
     for (; b; b /= 2, a *= a) {
         if (b % 2) {
@@ -23,6 +23,7 @@ T power(T a, int b) {
 struct Z {
     int x;
     Z(int x = 0) : x(norm(x)) {}
+    Z(i64 x) : x(norm(x % P)) {}
     int val() const {
         return x;
     }
@@ -67,5 +68,14 @@ struct Z {
         Z res = lhs;
         res /= rhs;
         return res;
+    }
+    friend std::istream &operator>>(std::istream &is, Z &a) {
+        i64 v;
+        is >> v;
+        a = Z(v);
+        return is;
+    }
+    friend std::ostream &operator<<(std::ostream &os, const Z &a) {
+        return os << a.val();
     }
 };

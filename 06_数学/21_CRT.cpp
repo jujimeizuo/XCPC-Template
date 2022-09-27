@@ -31,11 +31,9 @@ ll CRT() {
         ll ret = INV(mm , m[i]); // 先求逆元
         ans = (ans + a[i] * mm % M * ret % M) % M;
 /*
- 
- ans = (ans + quick_mul(quick_mul(m , ret , M) , b[i] , M)) % M;
- 利用快速乘防止爆longlong 
-        
- */
+ans = (ans + quick_mul(quick_mul(m , ret , M) , b[i] , M)) % M;
+利用快速乘防止爆longlong 
+*/
     }
     return (ans + M) % M;
 }

@@ -1,5 +1,3 @@
-#include <bits/stdc++.h>
-
 constexpr int P = 998244353;
 using i64 = long long;
 // assume -P <= x < 2P
@@ -298,22 +296,3 @@ struct Poly {
         return ans;
     }
 };
-
-int main() {
-    // fenzhi fft
-    auto solve = [&](auto self, int l, int r) {
-        if (r - l == 1) {
-            return Poly({1,  "init" });
-        }
-        int m = (l + r) / 2;
-        return self(self, l, m) * self(self, m, r);
-    };
-    
-    auto p = solve(solve, 0, n);
-    
-    // pow(k) 长度为n的多项式，求k次幂前m项
-    Poly a; a.resize(n);
-    a = a.log(m);
-    for(int i = 0;i < m; i++) a.a[i] = a.a[i] * k;
-    a = a.exp(m);
-}

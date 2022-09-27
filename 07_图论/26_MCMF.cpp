@@ -1,25 +1,21 @@
-const int maxn = 1005;      //点数
-
-struct Edge {
-    int from, to, cap, flow, cost;
-
-    Edge(int u, int v, int c, int f, int cc)
-            : from(u), to(v), cap(c), flow(f), cost(cc) {}
-};
-
 struct MCMF {
+    struct Edge {
+    int from, to, cap, flow, cost;
+    Edge(int u, int v, int c, int f, int cc)
+        : from(u), to(v), cap(c), flow(f), cost(cc) {}
+    };
+    static constexpr int INF = 1e9;
     int n, m;
-    vector<Edge> edges;
-    vector<int> G[maxn];
-    int inq[maxn];  //是否在队列中
-    int d[maxn];    //bellmanford
-    int p[maxn];    //上一条弧
-    int a[maxn];    //可改进量
-    void init(int n) {
-        this->n = n;
-        for (int i = 0; i <= n; ++i) G[i].clear();
-        edges.clear();
-    }
+    
+    std::vector<Edge> edges;
+    std::vector<std::vector<int>> G;
+    std::vector<int> inq;
+    std::vector<int> d;
+    std::vector<int> p;
+    std::vector<int> a;
+
+    
+    MCMF(int n) : n(n), G(n), inq(n), d(n), p(n), a(n) {}
 
     void add(int from, int to, int cap, int cost) {
         edges.emplace_back(Edge(from, to, cap, 0, cost));
@@ -30,12 +26,12 @@ struct MCMF {
     }
 
     bool spfa(int s, int t, int &flow, int &cost) {
-        for (int i = 1; i <= n; ++i) d[i] = INF;
-        memset(inq, 0, sizeof(inq));
+        for (int i = 1; i < n; ++i) d[i] = INF;
+        inq.assign(n, 0);
         d[s] = 0;
         inq[s] = 1;
         p[s] = 0;
-        queue<int> q;
+        std::queue<int> q;
         a[s] = INF;
         q.push(s);
         while (!q.empty()) {
@@ -47,7 +43,7 @@ struct MCMF {
                 if (e.cap > e.flow && d[e.to] > d[u] + e.cost) {
                     d[e.to] = d[u] + e.cost;
                     p[e.to] = G[u][i];
-                    a[e.to] = min(a[u], e.cap - e.flow);
+                    a[e.to] = std::min(a[u], e.cap - e.flow);
                     if (!inq[e.to]) {
                         q.push(e.to);
                         inq[e.to] = 1;
@@ -71,4 +67,4 @@ struct MCMF {
         while (spfa(s, t, flow, cost));
         return flow;
     }
-} mcmf;
+};
