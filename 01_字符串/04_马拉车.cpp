@@ -1,74 +1,30 @@
-#include <iostream>
-#include <cstdio>
-#include <cstring>
-#define Min(a,b) a>b?b:a
-#define Max(a,b) a>b?a:b
-using namespace std;
-const int N = 2e6 + 10 ;
-int Len[N] , a[N] ;
-char str[N] ;
-int n,mx,id,len;
-string s ;
-void init(int l , int r){
-    
-    int k=0;
-    str[k++] = '$';
-    for(int i=l;i<=r;i++){
-    
-        str[k++]='#';
-        str[k++]=s[i];
+template <typename T>
+std::vector<int> manacher(int n, const T &s) {
+    if (n == 0) {
+        return std::vector<int>();
     }
-    str[k++]='#';
-    len=k;
-    str[k] = '\0' ;
-}
-int ans = 0 , flag ;
-int Manacher(){
-    
-  Len[0] = 0;
-  int sum = 0;
-  mx = 0;
-  id = 0 ;
-  // cout << str << endl ;
-  for(int i=1;i<len;i++){
-    
-    if(i < mx) Len[i] = Min(mx - i, Len[2 * id - i]);
-    else Len[i] = 1;
-    while(str[i - Len[i]]== str[i + Len[i]]) Len[i]++;
-    if(Len[i] + i > mx){
-            // 更新最长的回文串
-      mx = Len[i] + i;          // mx是回文串右边一个位置
-      id = i;             //id是回文串的中心
-      sum = Max(sum, Len[i]);         // sum 是回文串的长度 + 1
-
+    std::vector<int> res(2 * n - 1, 0);
+    int l = -1, r = -1;
+    for (int z = 0; z < 2 * n - 1; z++) {
+        int i = (z + 1) >> 1;
+        int j = z >> 1;
+        int p = (i >= r ? 0 : std::min(r - i, res[2 * (l + r) - z]));
+        while (j + p + 1 < n && i - p - 1 >= 0) {
+            if (!(s[j + p + 1] == s[i - p - 1])) {
+                break;
+            }
+            p++;
+        }
+        if (j + p > r) {
+            l = i - p;
+            r = j + p;
+        }
+        res[z] = p;
     }
-    // cout << i << " " << Len[i] << endl ;
-    // if(Len[i] == i)  表示前缀是回文的
-    //  {
-    
-    //    if(ans < Len[i])
-    //     ans = Len[i] - 1 , flag = 1 ;
-    //  }
-    // if(Len[i] + i == len)  表示后缀是回文的
-    //  if(ans < Len[i])
-    //   ans = Len[i] - 1 , flag = 2 ;
-  }
-  return sum - 1 ;
+    return res;
 }
-
-int main()
-{
-    
-  scanf("%d",&n);
-  while(n--){
-    
-    cin >> s ;
-    len = s.size();
-    int l = 0 , r = len - 1 ;
-    init(l , r);
-    ans = 0 , flag = 0 ;
-    // cout << Manacher() << endl ;
-  }
-  return 0;
+ 
+template <typename T>
+std::vector<int> manacher(const T &s) {
+    return manacher((int) s.size(), s);
 }
-
