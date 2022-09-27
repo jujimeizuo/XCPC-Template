@@ -1,24 +1,45 @@
-class KMP {
-public :
-    const int n, m;
-    std::string s, t;
-    std::vector<int> next;
-    std::vector<int> ans;
-    KMP(string _s, string _t) : n(_s.size()), m(_t.size()), s(_s), t(_t), next(t.size() + 1) {
-        for(int i = 1, j = 0;i < m; i++) {
-            while(j > 0 && _t[j] != _t[i]) j = next[j];
-            if(_t[j] == _t[i]) j++;
-            next[i + 1] = j;
+template <typename T>
+std::vector<int> kmp_table(int n, const T &s) {
+    std::vector<int> p(n, 0);
+    int k = 0;
+    for (int i = 1; i < n; i++) {
+        while (k > 0 && !(s[i] == s[k])) {
+            k = p[k - 1];
+        }
+        if (s[i] == s[k]) {
+            k++;
+        }
+        p[i] = k;
+    }
+    return p;
+}
+
+template <typename T>
+std::vector<int> kmp_table(const T &s) {
+    return kmp_table((int) s.size(), s);
+}
+
+template <typename T>
+std::vector<int> kmp_search(int n, const T &s, int m, const T &w, const std::vector<int> &p) {
+    assert(n >= 1 && (int) p.size() == n);
+    std::vector<int> res;
+    int k = 0;
+    for (int i = 0; i < m; i++) {
+        while (k > 0 && (k == n || !(w[i] == s[k]))) {
+            k = p[k - 1];
+        }
+        if (w[i] == s[k]) {
+            k++;
+        }
+        if (k == n) {
+            res.push_back(i - n + 1);
         }
     }
-    void match() {
-        if(m == 0 || n == 0) ans.push_back(0);
-        for(int i = 0, j = 0;i < n; i++) {
-            while(j > 0 && s[i] != t[j]) j = next[j];
-            if(s[i] == t[j]) j++;
-            if(j == m) ans.push_back(i - m + 1);
-        }
-    }
-    int first() { return ans.size() == 0 ? -1 : ans.front(); }
-    int size() { return (int) ans.size(); }
-};
+    return res;
+    // returns 0-indexed positions of occurrences of s in w
+}
+
+template <typename T>
+std::vector<int> kmp_search(const T &s, const T &w, const std::vector<int> &p) {
+    return kmp_search((int) s.size(), s, (int) w.size(), w, p);
+}
