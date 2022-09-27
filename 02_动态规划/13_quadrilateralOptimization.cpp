@@ -3,7 +3,8 @@
 //1. cost(b, c) <= cost(a, d)
 //2. cost(a, c) + cost(b, d) <= cost(a, d) + cost(b, c), 即交叉小于包含
 
-void solve() {
+template <typename T>
+void quadrilateralOptimization() {
     for (int len = 2; len <= n; len++) {
         for (int l = 1, r; l + len - 1 <= n; l++) {
             r = l + len - 1;
