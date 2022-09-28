@@ -1,68 +1,42 @@
-#include <bits/stdc++.h>
-using namespace std;
+template<typename T>
+class Trie {
+private :
+    Trie* next[2] = {nullptr};
+    int val;
+    const int maxl = 32;
+public : 
+    Trie() {}
 
-const int N = 1e3 * 32 + 10;
-
-int t[N][2];
-int num[N];
-int idx;
-
-void insert(ll x) {
-    int rt = 0;
-    for(int i = 32;i >= 0; i--) {
-        int v = x >> i & 1;
-        if(!t[rt][v]) {
-            t[idx][0] = t[idx][1] = 0;
-            num[idx] = 0;
-            t[rt][v] = idx++;
+    void insert(T x) {
+        Trie* root = this;
+        for(int i = maxl; i >= 0; i--) {
+            int u = x >> i & 1;
+            if(root -> next[u] == nullptr) root -> next[u] = new Trie();
+            root = root -> next[u];
+            root -> val ++;
         }
-        rt = t[rt][v];
-        num[rt]++;
     }
-}
 
-void modify(ll x, int val) {
-    int rt = 0;
-    for(int i = 32;i >= 0; i--) {
-        int v = x >> i & 1;
-        rt = t[rt][v];
-        num[rt] += val;
-    }
-}
-
-ll query(ll x) {
-    ll ans = 0;
-    int rt = 0;
-    for(int i = 32;i >= 0; i--) {
-        int v = x >> i & 1;
-        if(t[rt][!v] && num[t[rt][!v]]) {
-            ans += 1 << i;
-            rt = t[rt][!v];
+    void del(T x) {
+        Trie* root = this;
+        for (int i = maxl; i >= 0; i--) {
+            root = root -> next[x >> i & 1];
+            root -> val --;
         }
-        else rt = t[rt][v];
     }
-    return ans;
-}
 
-// 不能有两个相同的异或，加一个num数组，表示访问次数
-
-int main() {
-    int _ = read();
-    while(_--) {
-        idx = 1; t[0][0] = t[0][1] = 0;
-        int n = read();
-        vector<ll> a(n + 1);
-        for(int i = 1;i <= n; i++) insert(a[i] = read());
-        ll ans = 0;
-        for(int i = 1;i <= n; i++) {
-            modify(a[i], -1);
-            for(int j = i + 1;j <= n; j++) {
-                modify(a[j], -1);
-                ans = max(ans, query(a[i] + a[j]));
-                modify(a[j], 1);
+    T search(T x) {
+        T ans = 0;
+        Trie* root = this;
+        for (int i = maxl; i >= 0; i--) {
+            int u = x >> i & 1;
+            if (root -> next[!u] && root -> next[!u] -> val) {
+                ans += 1 << i;
+                root = root -> next[!u];
+            } else {
+                root = root -> next[u];
             }
-            modify(a[i], 1);
         }
-        cout << ans << endl;
+        return ans;
     }
-}
+};

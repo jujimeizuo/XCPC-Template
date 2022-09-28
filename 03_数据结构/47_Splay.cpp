@@ -1,164 +1,314 @@
-#include <bits/stdc++.h>
-using namespace std;
+class node {
+public:
+    int id;
+    node *l;
+    node *r;
+    node *p;
+    bool rev;
+    int sz;
+    // declare extra variables
 
-const int N = 1e5 + 10;
+    node(int _id) {
+        id = _id;
+        l = r = p = nullptr;
+        rev = false;
+        sz = 1;
+        // init extra variables
+    }
+    
+    void unsafe_reverse() {
+        rev ^= 1;
+        std::swap(l, r);
+        pull();
+    }
 
-struct Splay { // 有旋平衡树
-#define rt  ch[0][1]
-#define lc  ch[u][0]
-#define rc  ch[u][1]
-#define identify(u) (ch[fa[u]][1] == u)
-    int tot, totElement;
-    int val[N], cnt[N], fa[N], sum[N];
-    int ch[N][2];
-    Splay() { tot = totElement = 0; }
-    void push_up(int u) { sum[u] = sum[lc] + sum[rc] + cnt[u]; }
-    void connect(int u, int par, int son) { ch[par][son] = u, fa[u] = par; }
-    void rotate(int u) {
-        int fc = identify(u), f = fa[u];
-        int gc = identify(f), g = fa[f];
-        int uc = fc ^ 1, son = ch[u][uc];
-        connect(son, f, fc);
-        connect(f, u, uc);
-        connect(u, g, gc);
-        push_up(f);
-        push_up(u);
+    // apply changes:
+    void unsafe_apply() {
     }
-    void splay(int u, int v) {
-        v = fa[v];
-        while (fa[u] != v) {
-            int f = fa[u];
-            if (fa[f] != v)
-                rotate(identify(u) ^ identify(f) ? u : f);
-            rotate(u);
-        }
-    }
-    int creat(int v, int par) {
-        val[++tot] = v;
-        fa[tot] = par;
-        sum[tot] = cnt[tot] = 1;
-        return tot;
-    }
-    void destory(int u) {
-        val[u] = cnt[u] = fa[u] = sum[u] = lc = rc = 0;
-        tot -= u == tot;
-    }
-    int find(int v) {
-        int u = rt;
-        while (1) {
-            if (val[u] == v) {
-                splay(u, rt);
-                return u;
-            }
-            int nxt = v > val[u];
-            if (!ch[u][nxt]) return -1;
-            u = ch[u][nxt];
-        }
-    }
-    int insert(int v) {
-        totElement++;
-        if (totElement == 1) {
-            creat(v, 0);
-            return rt = tot;
-        }
-        int u = rt;
-        while (1) {
-            sum[u]++;
-            if (v == val[u]) {
-                cnt[u]++;
-                return u;
-            }
-            int nxt = v > val[u];
-            if (!ch[u][nxt]) {
-                creat(v, u);
-                splay(ch[u][nxt] = tot, rt);
-                return tot;
-            }
-            u = ch[u][nxt];
-        }
-    }
-    void remove(int v) {
-        int u = find(v);
-        if (!u) return;
-        totElement--;
-        if (cnt[u] > 1) {
-            cnt[u]--, sum[u]--;
-            return;
-        }
-        if (!lc) fa[rt = rc] = 0;
-        else {
-            int now = lc;
-            while (ch[now][1]) now = ch[now][1];
-            splay(now, lc);
-            connect(rc, now, 1); connect(now, 0, 1);
-            push_up(now);
-        }
-        destory(u);
-    }
-    int getRank(int v) {
-        int k = 0, u = rt;
-        while (1) {
-            if (v == val[u]) {
-                k += sum[lc] + 1;
-                splay(u, rt);
-                return k;
-            }
-            else if (v < val[u]) u = lc;
-            else {
-                k += sum[lc] + cnt[u];
-                u = rc;
-            }
-            if (!u) return 0;
-        }
-    }
-    int atRank(int k) {
-        if (k > totElement) return -1;
-        int u = rt;
-        while (1) {
-            if (k > sum[lc] && k <= sum[lc] + cnt[u]) {
-                splay(u, rt);
-                break;
-            }
-            if (k <= sum[lc]) u = lc;
-            else {
-                k -= sum[lc] + cnt[u];
-                u = rc;
-            }
-        }
-        return val[u];
-    }
-    int upper(int v) {
-        int u = rt, minn = 0x3f3f3f3f, p = 0;
-        while (u) {
-            if (val[u] > v && val[u] < minn) minn = val[u], p = u;
-            if (v >= val[u]) u = rc;
-            else u = lc;
-        }
-        if (!p) splay(p, rt);
-        return minn;
-    }
-    int lower(int v) {
-        int u = rt, maxx = -0x3f3f3f3f, p = 0;
-        while (u) {
-            if (val[u] < v && val[u] > maxx) maxx = val[u], p = u;
-            if (v <= val[u]) u = lc;
-            else u = rc;
-        }
-        if (!p) splay(p, rt);
-        return maxx;
-    }
-}splay;
 
-void solve() {
-    int _; cin >> _;
-    while(_--) {
-        int opt, x;
-        cin >> opt >> x;
-        if(opt == 1) splay.insert(x);
-        else if(opt == 2) splay.remove(x);
-        else if(opt == 3) cout << splay.getRank(x) << endl;
-        else if(opt == 4) cout << splay.atRank(x) << endl;
-        else if(opt == 5) cout << splay.lower(x) << endl;
-        else if(opt == 6) cout << splay.upper(x) << endl;
+    void push() {
+        if (rev) {
+            if (l != nullptr) {
+                l -> unsafe_reverse();
+            }
+            if (r != nullptr) {
+                r -> unsafe_reverse();
+            }
+            rev = 0;
+        }
+        // now push everything else:
+    }
+
+    void pull() {
+        sz = 1;
+        // now init from self:
+
+        if (l != nullptr) {
+            l -> p = this;
+            sz += l -> sz;
+            // now pull from l:
+
+        }
+        if (r != nullptr) {
+            r -> p = this;
+            sz += r -> sz;
+            // now pull from r:
+
+        }
+    }
+};
+
+void debug_node(node* v, std::string pref = "") {
+#ifdef LOCAL
+    if (v != nullptr) {
+        debug_node(v -> r, pref + " ");
+        std::cerr << pref << "-" << " " << v -> id << '\n';
+        debug_node(v -> l, pref + " ");
+    } else {
+        std::cerr << pref << "-" << " " << "NULL" << '\n';
+    }
+#endif
+}
+
+namespace splay_tree {
+
+bool is_bst_root(node* v) {
+    if (v == nullptr) {
+        return false;
+    }
+    return (v -> p == nullptr || (v -> p -> l != v && v -> p -> r != v));
+}
+void rotate(node* v) {
+    node* u = v -> p;
+    assert(u != nullptr);
+    u -> push();
+    v -> push();
+    v -> p = u -> p;
+    if (v -> p != nullptr) {
+        if (v -> p -> l == u) {
+            v -> p -> l = v;
+        }
+        if (v -> p -> r == u) {
+            v -> p -> r = v;
+        }
+    }
+    if (v == u -> l) {
+        u -> l = v -> r;
+        v -> r = u;
+    } else {
+        u -> r = v -> l;
+        v -> l = u;
+    }
+    u -> pull();
+    v -> pull();
+}
+
+void splay(node* v) {
+    if (v == nullptr) {
+        return ;
+    }
+    while (!is_bst_root(v)) {
+        node* u = v -> p;
+        if (!is_bst_root(u)) {
+            if ((u -> l == v) ^ (u -> p -> l == u)) {
+                rotate(v);
+            } else {
+                rotate(u);
+            }
+        }
+        rotate(v);
     }
 }
+
+std::pair<node*, int> find(node* v, const std::function<int(node*)> &go_to) {
+    // go_to returns: 0 -- found; -1 -- go left; 1 -- go right
+    // find returns the last vertex on the descent and its go_to
+    if (v == nullptr) {
+        return {nullptr, 0};
+    }
+    splay(v);
+    int dir;
+    while (true) {
+        v -> push();
+        dir = go_to(v);
+        if (dir == 0) {
+            break ;
+        }
+        node* u = (dir == -1 ? v -> l : v -> r);
+        if (u == nullptr) {
+            break ;
+        }
+        v = u;
+    }
+    splay(v);
+    return {v, dir};
+}
+
+node* get_leftmost(node* v) {
+    return find(v, [&](node*) { return -1; }).first;
+}
+
+node* get_rightmost(node* v) {
+    return find(v, [&](node*) { return 1;  }).first;
+}
+
+node* get_kth(node* v, int k) { // 0-indexed
+    std::pair<node*, int> p = find(v, [&](node* u) {
+        if (u -> l != nullptr) {
+            if (u -> l -> sz > k) {
+                return -1;
+            }
+            k -= u -> l -> sz;
+        }
+        if (k == 0) {
+            return 0;
+        }
+        k--;
+        return 1;
+    });
+    return (p.second == 0 ? p.first : nullptr);
+}
+
+int get_position(node* v) { // 0-indexed
+    splay(v);
+    return (v -> l != nullptr ? v -> l -> sz : 0);
+}
+
+node* get_bst_root(node* v) {
+    splay(v);
+    return v;
+}
+
+std::pair<node*, node*> split(node* v, const std::function<bool(node*)> &is_right) {
+    if (v == nullptr) {
+        return {nullptr, nullptr};
+    }
+    std::pair<node*, int> p = find(v, [&](node* u) { return is_right(u) ? -1 : 1; });
+    v = p.first;
+    v -> push();
+    if (p.second == -1) {
+        node* u = v -> l;
+        if (u == nullptr) {
+            return {nullptr, v};
+        }
+        v -> l = nullptr;
+        u -> p = v -> p;
+        u = get_rightmost(u);
+        v -> p = u;
+        v -> pull();
+        return {u, v};
+    } else {
+        node* u = v -> r;
+        if (u == nullptr) {
+            return {v, nullptr};
+        }
+        v -> r = nullptr;
+        v -> pull();
+        return {v, u};
+    }
+}
+
+std::pair<node*, node*> split_leftmost_k(node* v, int k) {
+    return split(v, [&](node* u) {
+        int left_and_me = (u -> l != nullptr ? u -> l -> sz : 0) + 1;
+        if (k >= left_and_me) {
+            k -= left_and_me;
+            return false;
+        }
+        return true;
+    });
+}
+
+node* merge(node* v, node* u) {
+    if (v == nullptr) {
+        return u;
+    }
+    if (u == nullptr) {
+        return v;
+    }
+    v = get_rightmost(v);
+    assert(v -> r == nullptr);
+    splay(u);
+    v -> push();
+    v -> r = u;
+    v -> pull();
+    return v;
+}
+
+int count_left(node* v, const std::function<bool(node*)> &is_right) {
+    if (v == nullptr) {
+        return 0;
+    }
+    std::pair<node*, int> p = find(v, [&](node* u) { return is_right(u) ? -1 : 1; });
+    node* u = p.first;
+    return (u -> l != nullptr ? u -> l -> sz : 0) + (p.second == 1);
+}
+
+node* add(node* r, node* v, const std::function<bool(node*)> &go_left) {
+    std::pair<node*, node*> p = split(r, go_left);
+    return merge(p.first, merge(v, p.second));
+}
+
+node* remove(node* v) { // returns the new root
+    splay(v);
+    v -> push();
+    node* x = v -> l;
+    node* y = v -> r;
+    v -> l = v -> r = nullptr;
+    node* z = merge(x, y);
+    if (z != nullptr) {
+        z -> p = v -> p;
+    }
+    v -> p = nullptr;
+    v -> push();
+    v -> pull(); //  now v might be reusable
+    return z;
+}
+
+node* next(node* v) {
+    splay(v);
+    v -> push();
+    if (v -> r == nullptr) {
+        return nullptr;
+    }
+    v = v -> r;
+    while (v -> l != nullptr) {
+        v -> push();
+        v = v -> l;
+    }
+    splay(v);
+    return v;
+}
+
+node* prev(node* v) {
+    splay(v);
+    v -> push();
+    if (v -> l == nullptr) {
+        return nullptr;
+    }
+    v = v -> l;
+    while (v -> r != nullptr) {
+        v -> push();
+        v = v -> r;
+    }
+    splay(v);
+    return v;
+}
+
+int get_size(node* v) {
+    splay(v);
+    return (v != nullptr ? v -> sz : 0);
+}
+
+template<typename... T>
+void apply(node* v, T... args) {
+    splay(v);
+    v -> unsafe_apply(args...);
+}
+
+void reverse(node* v) {
+    splay(v);
+    v -> unsafe_reverse();
+}
+
+} // namespace splay_tree

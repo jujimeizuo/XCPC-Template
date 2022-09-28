@@ -6,36 +6,34 @@ using namespace std;
 const int N = 1e5 + 10;
 
 int a[N];
-int dp[N][105];
 
-// 一维ST表
-void One_ST(){
+
+template <typename T, class F = std::function<T(const T&, const T&)>>
+class SparseTable {
+public:
     int n;
-    cin >> n;
-    for(int i = 1;i <= n; i++) {
-        cin >> a[i];
-        dp[i][0] = a[i];
-
-        // cin >> dp[i][0];
-    }
-
-    for(int j = 1;j <= log2(n); j++) {
-        for(int i = 1;i <= n; i++) {
-            if(i + (1 << (j - 1)) <= n)
-                dp[i][j] = max(dp[i][j - 1], dp[i + (1 << (j - 1))][j - 1]);
+    std::vector<std::vector<T>> mat;
+    F func;
+ 
+    SparseTable(const std::vector<T>& a, const F& f) : func(f) {
+        n = static_cast<int>(a.size());
+        int max_log = 32 - __builtin_clz(n);
+        mat.resize(max_log);
+        mat[0] = a;
+        for (int j = 1; j < max_log; j++) {
+            mat[j].resize(n - (1 << j) + 1);
+            for (int i = 0; i <= n - (1 << j); i++) {
+                mat[j][i] = func(mat[j - 1][i], mat[j - 1][i + (1 << (j - 1))]);
+            }
         }
     }
-
-    int T;
-    cin >> T;
-    while(T--) {
-        int l, r;
-        cin >> l >> r;
-        int len = log2(r - l + 1);
-        int k = max(dp[l][len], dp[r - (1 << len) + 1][len]);
-        cout << k << endl;
+ 
+    T get(int from, int to) const {
+        assert(0 <= from && from <= to && to <= n - 1);
+        int lg = 32 - __builtin_clz(to - from + 1) - 1;
+        return func(mat[lg][from], mat[lg][to - (1 << lg) + 1]);
     }
-}
+};
 
 // 二维ST表
 int f[105][105][105];

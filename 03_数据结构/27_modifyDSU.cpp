@@ -30,4 +30,4 @@ public:
         }
     }
     bool judge() { return siz[find(1)] == totNode; }
-} uf;
+};
