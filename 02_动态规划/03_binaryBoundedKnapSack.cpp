@@ -4,7 +4,7 @@ T binaryMultipleKnapSack(const std::vector<int>& v, const std::vector<T>& w, con
     std::vector<T> dp(V + 1);
     std::vector<std::array<T, 2>> bags;
     for (int i = 0; i < n; i++) {
-        for (int k = 1; k <= cnt[i]; k <<= 2) {
+        for (int k = 1; k <= cnt[i]; k <<= 1) {
             cnt[i] -= k;
             bags.push_back({v[i] * k, w[i] * k});
         }

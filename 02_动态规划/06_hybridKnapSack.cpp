@@ -19,7 +19,7 @@ T hybridKnapSack(const std::vector<int>& v, const std::vector<T>& w, const std::
         }
     }
     for (auto& bag : bags) {
-        int v, w, op;
+        int v, op; T w;
         std::tie(v, w, op) = bag;
         if (op == -1) {
             for (int j = V; j >= v; j--) {
