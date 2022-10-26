@@ -10,15 +10,16 @@ std::vector<T> spfa(const graph<T>& g, int st) {
         vis[u] = false;
         for (int id : g.g[u]) {
             auto& e = g.edges[id];
-            if (dist[e.to] > dist[e.from] + e.cost) {
-                dist[e.to] = dist[e.from] + e.cost;
-                if (!vis[e.to]) {
-                    cnt[e.to]++;
-                    vis[e.to] = true;
-                    if (cnt[e.to] >= g.n) {
+            int to = e.from ^ e.to ^ u;
+            if (dist[to] > dist[u] + e.cost) {
+                dist[to] = dist[u] + e.cost;
+                if (!vis[to]) {
+                    cnt[to]++;
+                    vis[to] = true;
+                    if (cnt[to] >= g.n) {
                         return std::vector<T>();
                     }
-                    x.push_back(e.to);
+                    x.push_back(to);
                 }
             }
         }

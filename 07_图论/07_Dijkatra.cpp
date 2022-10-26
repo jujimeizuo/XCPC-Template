@@ -14,8 +14,8 @@ std::vector<T> dijkstra(const graph<T>& g, int st) {
         for (int id : g.g[u]) {
             auto& e = g.edges[id];
             int to = e.from ^ e.to ^ u;
-            if (dist[to] > dist[e.from] + e.cost) {
-                dist[to] = dist[e.from] + e.cost;
+            if (dist[to] > dist[u] + e.cost) {
+                dist[to] = dist[u] + e.cost;
                 q.emplace(dist[to], to);
             }
         }
