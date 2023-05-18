@@ -1,5 +1,4 @@
 #include "bits/stdc++.h"
-
 using namespace std;
 
 typedef long long ll;
@@ -18,12 +17,9 @@ typedef pair<ll, ll> pll;
 
 const ll INF = 0x3f3f3f3f;
 const ll mod = 998244353;
-// const ll mod = 1e9 + 7;
 const double eps = 1e-6;
 const double PI = acos(-1);
 const double R = 0.57721566490153286060651209;
-
-
 
 void solve() {
 

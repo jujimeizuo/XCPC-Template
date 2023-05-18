@@ -47,6 +47,7 @@ def InitSetting():
             global TITLE, SCHOOL, TEAM, FILE
             for key in ['TITLE', 'SCHOOL', 'TEAM', 'FILE']:
                 globals()[key] = SettingData[key].encode('utf-8')
+            print(globals()['FILE'])
         else:
             NewSetting()
     except:
@@ -132,6 +133,8 @@ if __name__ == '__main__':
                '\\subsection{%s}\n', '\\subsubsection{%s}\n']
 
     InitSetting()
+
+    print(FILE)
 
     TargetFile = open('%s.tex' % FILE, 'w')
 
