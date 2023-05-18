@@ -18,7 +18,7 @@ public:
         assert(!pv.empty());
         int max_depth = 0;
         for (int i = 0; i < n; i++) {
-            max_depth = max(max_depth, depth[i]);
+            max_depth = std::max(max_depth, depth[i]);
         }
         h = 1;
         while ((1 << h) <= max_depth) {
@@ -42,7 +42,7 @@ public:
  
     inline int go_up(int x, int up) {
         assert(!pr.empty());
-        up = min(up, (1 << h) - 1);
+        up = std::min(up, (1 << h) - 1);
         for (int j = h - 1; j >= 0; j--) {
             if (up & (1 << j)) {
                 x = pr[x][j];
@@ -68,5 +68,9 @@ public:
             }
         }
         return pr[x][0];
+    }
+
+    inline int dist(int x, int y) {
+        return depth[x] + depth[y] - depth[lca(x, y)] * 2;
     }
 };

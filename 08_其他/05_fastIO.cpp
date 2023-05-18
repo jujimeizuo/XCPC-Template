@@ -1,4 +1,3 @@
-/*
 namespace FastIO {
     char gc(void) {
         const int S = 1 << 17;
@@ -16,7 +15,7 @@ namespace FastIO {
     }
 }
 using namespace FastIO;
-*/
+
 
 static struct FastInput {
     static constexpr int BUF_SIZE = 1 << 20;
